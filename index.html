@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>KISS DAY // SYSTEM OVERRIDE</title>
+
+<style>
+html, body {
+    margin: 0;
+    padding: 0;
+    background: black;
+    overflow: hidden;
+    cursor: crosshair;
+    font-family: monospace;
+}
+
+#title {
+    position: fixed;
+    top: 40%;
+    width: 100%;
+    text-align: center;
+    font-size: 4rem;
+    color: white;
+    mix-blend-mode: difference;
+    animation: flicker 0.15s infinite;
+    z-index: 10;
+}
+
+#sub {
+    position: fixed;
+    top: 55%;
+    width: 100%;
+    text-align: center;
+    color: #ff00aa;
+    letter-spacing: 4px;
+    z-index: 10;
+}
+
+@keyframes flicker {
+    0% { opacity: 1; }
+    50% { opacity: 0.3; }
+    100% { opacity: 1; }
+}
+
+canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+}
+</style>
+</head>
+
+<body>
+
+<div id="title">💋 WISH YOU HAPPY KISS DAY BANGARIII 💋</div>
+
+
+<canvas id="c"></canvas>
+
+<audio autoplay loop>
+    <source src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_63f6c61f5b.mp3">
+</audio>
+
+<script>
+const canvas = document.getElementById("c");
+const ctx = canvas.getContext("2d");
+
+canvas.width = innerWidth;
+canvas.height = innerHeight;
+
+window.onresize = () => {
+    canvas.width = innerWidth;
+    canvas.height = innerHeight;
+};
+
+let kisses = [];
+
+class Kiss {
+    constructor(x, y) {
+        this.x = x;
+        this.y = y;
+        this.size = Math.random() * 40 + 10;
+        this.vx = (Math.random() - 0.5) * 10;
+        this.vy = (Math.random() - 0.5) * 10;
+        this.life = 100;
+        this.color = `hsl(${Math.random()*360},100%,60%)`;
+        this.char = Math.random() > 0.5 ? "💋" : "❤️";
+    }
+
+    update() {
+        this.x += this.vx;
+        this.y += this.vy;
+        this.vy += 0.2;
+        this.life--;
+    }
+
+    draw() {
+        ctx.font = this.size + "px serif";
+        ctx.fillStyle = this.color;
+        ctx.fillText(this.char, this.x, this.y);
+    }
+}
+
+function spawn(x, y, count = 10) {
+    for (let i = 0; i < count; i++) {
+        kisses.push(new Kiss(x, y));
+    }
+}
+
+addEventListener("mousemove", e => {
+    spawn(e.clientX, e.clientY, 3);
+});
+
+addEventListener("click", e => {
+    spawn(e.clientX, e.clientY, 200);
+    screenShake();
+});
+
+function screenShake() {
+    document.body.style.transform = "scale(1.02)";
+    setTimeout(() => document.body.style.transform = "", 100);
+}
+
+function animate() {
+    ctx.fillStyle = "rgba(0,0,0,0.2)";
+    ctx.fillRect(0,0,canvas.width,canvas.height);
+
+    kisses.forEach((k, i) => {
+        k.update();
+        k.draw();
+        if (k.life <= 0) kisses.splice(i,1);
+    });
+
+    requestAnimationFrame(animate);
+}
+
+animate();
+</script>
+
+</body>
+</html>
